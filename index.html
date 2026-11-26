@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bouncing Box</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    padding: 1rem;
+  }
+ 
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+ 
+  #controls label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+ 
+  #container {
+    width: 400px;
+    height: 400px;
+    position: relative;
+    background: yellow;
+    border: 3px solid #333;      
+    box-sizing: content-box;
+  }
+ 
+  #animate {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    background-color: red;
+    top: 0;
+    left: 0;
+  }
+</style>
+</head>
+<body>
+ 
+<div id="controls">
+  <button id="startBtn">Start</button>
+  <button id="pauseBtn">Pause</button>
+  <button id="resetBtn">Reset</button>
+ 
+  <label>
+    Speed
+    <input type="range" id="speedSlider" min="1" max="10" value="3">
+    <span id="speedLabel">3</span>
+  </label>
+ 
+ 
+<div id="container">
+  <div id="animate"></div>
+</div>
+ 
+<script>
+const container   = document.getElementById("container");
+const elem        = document.getElementById("animate");
+const startBtn    = document.getElementById("startBtn");
+const pauseBtn    = document.getElementById("pauseBtn");
+const resetBtn    = document.getElementById("resetBtn");
+const speedSlider = document.getElementById("speedSlider");
+const sizeSlider  = document.getElementById("sizeSlider");
+const speedLabel  = document.getElementById("speedLabel");
+const sizeLabel   = document.getElementById("sizeLabel");
+ 
+let id = null;          
+let x = 0;              
+let y = 0;              
+let vx = 1;             
+let vy = 0.7;           
+let speed = 3;          
+let size = 50;         
+let colorIndex = 0;
+ 
+const colors = ["red", "royalblue", "green", "purple", "orange", "deeppink"];
+function draw() {
+  elem.style.left = x + "px";
+  elem.style.top = y + "px";
+}
+ 
+function nextColor() {
+  colorIndex = (colorIndex + 1) % colors.length;
+  elem.style.backgroundColor = colors[colorIndex];
+}
+ 
+function frame() {
+  x += vx * speed;
+  y += vy * speed;
+ 
+  const maxX = container.clientWidth - size;
+  const maxY = container.clientHeight - size;
+ 
+  if (x <= 0) {
+    x = 0;
+    vx = Math.abs(vx);     
+    nextColor();
+  } else if (x >= maxX) {
+    x = maxX;
+    vx = -Math.abs(vx);     
+    nextColor();
+  }
+ 
+  if (y <= 0) {
+    y = 0;
+    vy = Math.abs(vy);      
+    nextColor();
+  } else if (y >= maxY) {
+    y = maxY;
+    vy = -Math.abs(vy);    
+    nextColor();
+  }
+ 
+  draw();
+ 
+  id = requestAnimationFrame(frame);
+}
+ 
+function startAnimation() {
+  if (id !== null) return;          
+  id = requestAnimationFrame(frame);
+}
+ 
+function pauseAnimation() {
+  cancelAnimationFrame(id);         
+  id = null;
+}
+ 
+function resetAnimation() {
+  pauseAnimation();
+  x = 0;
+  y = 0;
+  vx = 1;
+  vy = 0.7;
+  colorIndex = 0;
+  elem.style.backgroundColor = colors[0];
+ 
+  speed = 3;
+  speedSlider.value = 3;
+  speedLabel.textContent = 3;
+ 
+  size = 50;
+  sizeSlider.value = 50;
+  sizeLabel.textContent = 50;
+  elem.style.width = size + "px";
+  elem.style.height = size + "px";
+ 
+  draw();
+}
+ 
+startBtn.addEventListener("click", startAnimation);
+pauseBtn.addEventListener("click", pauseAnimation);
+resetBtn.addEventListener("click", resetAnimation);
+
+speedSlider.addEventListener("input", function () {
+  speed = Number(speedSlider.value);   
+  speedLabel.textContent = speed;
+});
+ 
+ 
+draw();  
+</script>
+ 
+</body>
+</html>
